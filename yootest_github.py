@@ -1,16 +1,19 @@
 # yookassa
 from yookassa import Configuration, Payment
 
+# program modules
+from singleton import Singleton
+
 # system
 import os, sys
 
 # misc imports
 import uuid, json, logging, asyncio
 
-class YooKassaExampleApp:
+class YooKassaExampleApp(Singleton):
 
     @classmethod
-    def __init__(self):
+    def __init__(self) -> None:
         self.account_id: int = 123456
         
         self.secret_key: str = 'your secret key'
@@ -44,9 +47,10 @@ class YooKassaExampleApp:
         Configuration.account_id: int = self.account_id
         Configuration.secret_key: str = self.secret_key
 
+    
     # asynchronously waiting payment
     @classmethod
-    def __update_payment_status(self):
+    def __update_payment_status(self) -> str:
         payment = json.loads(
             Payment.find_one(
                 self.payment_id
@@ -55,7 +59,7 @@ class YooKassaExampleApp:
         return payment['status']
     
     @classmethod
-    async def __await_pending(self):
+    async def __await_pending(self) -> None:
         seconds_awaited: int = 0
         while self.__update_payment_status() == 'pending': 
             logging.info('waiting %d second(s)...' % seconds_awaited)
@@ -67,7 +71,7 @@ class YooKassaExampleApp:
     
     # entry point
     @classmethod
-    def run(self):
+    def run(self) -> None:
         self.payment = json.loads(
             Payment.create(
                 self.payment_config, 
